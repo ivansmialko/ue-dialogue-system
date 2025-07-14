@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FDialogueSystemModule : public IModuleInterface
+class FDialogueSystemRuntimeModule : public IModuleInterface
 {
 public:
 
