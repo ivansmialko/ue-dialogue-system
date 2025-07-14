@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+#include "CustomAssetAction.h"
+
 class FDialogueSystemEditorModule : public IModuleInterface
 {
 public:
