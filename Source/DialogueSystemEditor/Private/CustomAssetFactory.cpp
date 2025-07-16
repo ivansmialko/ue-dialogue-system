@@ -9,6 +9,7 @@ UCustomAssetFactory::UCustomAssetFactory(const FObjectInitializer& InObjectIniti
 UObject* UCustomAssetFactory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags InFlags, UObject* InContext, FFeedbackContext* InWarn)
 {
 	UCustomAsset* NewAsset = NewObject<UCustomAsset>(InParent, InName, InFlags);
+	return NewAsset;
 }
 
 bool UCustomAssetFactory::CanCreateNew() const
