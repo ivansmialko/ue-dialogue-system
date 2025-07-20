@@ -1,8 +1,8 @@
 #include "CustomAssetEditorAppTabFactory.h"
 #include "CustomAssetEditorApp.h"
 
-CustomAssetEditorAppTabFactory::CustomAssetEditorAppTabFactory(TSharedPtr<class UCustomAssetEditorApp> InApp):
-	FWorkflowTabFactory(FName("CustomAssetPrimaryTab"), InApp)
+CustomAssetEditorAppTabFactory::CustomAssetEditorAppTabFactory(TSharedPtr<CustomAssetEditorApp> InApp):
+	FWorkflowTabFactory(FName("CustomAssetEditorAppTab"), InApp)
 {
 	App = InApp;
 	TabLabel = FText::FromString(TEXT("Primary"));
@@ -10,12 +10,12 @@ CustomAssetEditorAppTabFactory::CustomAssetEditorAppTabFactory(TSharedPtr<class 
 	ViewMenuTooltip = FText::FromString(TEXT("Show the primary view"));
 }
 
-TSharedRef<SWidget> CustomAssetEditorAppTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo)
+TSharedRef<SWidget> CustomAssetEditorAppTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
 {
 	return SNew(STextBlock).Text(FText::FromString(TEXT("This is a text widget created for the custom tab")));
 }
 
-FText CustomAssetEditorAppTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo)
+FText CustomAssetEditorAppTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
 {
 	return FText::FromString(TEXT("A primary view for whatever"));
 }

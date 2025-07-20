@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
 
-class CustomAssetEditorApp : public FWorkflowCentricApplication, public EEditorUndoClient, public FNotifyHook
+class CustomAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
 public:
 	virtual void RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager) override;

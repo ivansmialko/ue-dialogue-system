@@ -1,4 +1,5 @@
 #include "CustomAssetEditorApp.h"
+#include "CustomAssetEditorAppTabMode.h"
 
 void CustomAssetEditorApp::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
 {
@@ -19,4 +20,7 @@ void CustomAssetEditorApp::InitEditor(const EToolkitMode::Type InMode, const TSh
 		true,
 		ObjectsToEdit
 	);
+
+	AddApplicationMode(TEXT("CustomAssetEditorAppTabMode"), MakeShareable(new CustomAssetEditorAppTabMode(SharedThis(this))));
+	SetCurrentMode(TEXT("CustomAssetEditorAppTabMode"));
 }
