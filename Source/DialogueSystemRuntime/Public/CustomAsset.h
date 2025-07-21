@@ -8,8 +8,8 @@ class DIALOGUESYSTEMRUNTIME_API UCustomAsset : public UObject
 {
 	GENERATED_BODY()
 
-//private fields
-private:
+//public fields
+public:
 	UPROPERTY(EditAnywhere)
 	FString AssetName;
 

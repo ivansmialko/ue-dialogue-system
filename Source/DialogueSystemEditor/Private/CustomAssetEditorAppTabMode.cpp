@@ -1,21 +1,36 @@
 #include "CustomAssetEditorAppTabMode.h"
 #include "CustomAssetEditorApp.h"
-#include "CustomAssetEditorAppTabFactory.h"
+#include "CustomAssetEditorAppTabFactoryProperties.h"
+#include "CustomAssetEditorAppTabFactoryGraph.h"
 
 CustomAssetEditorAppTabMode::CustomAssetEditorAppTabMode(TSharedPtr<class CustomAssetEditorApp> InApp) :
 	FApplicationMode(TEXT("CustomAssetEditorAppTabMode"))
 {
 	App = InApp;
-	TabsSet.RegisterFactory(MakeShareable(new CustomAssetEditorAppTabFactory(InApp)));
+	TabsSet.RegisterFactory(MakeShareable(new CustomAssetEditorAppTabFactoryGraph(InApp)));
+	TabsSet.RegisterFactory(MakeShareable(new CustomAssetEditorAppTabFactoryProperties(InApp)));
 
 	TabLayout = FTabManager::NewLayout("CustomAssetEditorAppTabMode_Layout_V1")
 		->AddArea
 		(
-			FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+			FTabManager::NewPrimaryArea()
+			->SetOrientation(Orient_Vertical)
 			->Split
 			(
-				FTabManager::NewStack()
-				->AddTab(FName(TEXT("CustomAssetEditorAppTab")), ETabState::OpenedTab)
+				FTabManager::NewSplitter()
+				->SetOrientation(Orient_Horizontal)
+				->Split
+				(
+					FTabManager::NewStack()
+					->SetSizeCoefficient(0.75)
+					->AddTab(FName(TEXT("CustomAssetEditorAppTabFactoryGraph")), ETabState::OpenedTab)
+				)
+				->Split
+				(
+					FTabManager::NewStack()
+					->SetSizeCoefficient(0.25)
+					->AddTab(FName(TEXT("CustomAssetEditorAppTabFactoryProperties")), ETabState::OpenedTab)
+				)
 			)
 		);
 }

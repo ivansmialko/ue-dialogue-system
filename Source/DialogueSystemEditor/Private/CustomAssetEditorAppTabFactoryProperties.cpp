@@ -1,19 +1,19 @@
-#include "CustomAssetEditorAppTabFactory.h"
+#include "CustomAssetEditorAppTabFactoryProperties.h"
 #include "CustomAssetEditorApp.h"
 #include "CustomAsset.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
 
-CustomAssetEditorAppTabFactory::CustomAssetEditorAppTabFactory(TSharedPtr<CustomAssetEditorApp> InApp):
-	FWorkflowTabFactory(FName("CustomAssetEditorAppTab"), InApp)
+CustomAssetEditorAppTabFactoryProperties::CustomAssetEditorAppTabFactoryProperties(TSharedPtr<CustomAssetEditorApp> InApp):
+	FWorkflowTabFactory(FName("CustomAssetEditorAppTabFactoryProperties"), InApp)
 {
 	App = InApp;
-	TabLabel = FText::FromString(TEXT("Primary"));
-	ViewMenuDescription = FText::FromString(TEXT("Displays a primary view for whatever"));
-	ViewMenuTooltip = FText::FromString(TEXT("Show the primary view"));
+	TabLabel = FText::FromString(TEXT("Properties"));
+	ViewMenuDescription = FText::FromString(TEXT("Current object properties"));
+	ViewMenuTooltip = FText::FromString(TEXT("Shows current object properties"));
 }
 
-TSharedRef<SWidget> CustomAssetEditorAppTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
+TSharedRef<SWidget> CustomAssetEditorAppTabFactoryProperties::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
 {
 	const TSharedPtr<CustomAssetEditorApp> Application = App.Pin();
 	FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
@@ -41,7 +41,7 @@ TSharedRef<SWidget> CustomAssetEditorAppTabFactory::CreateTabBody(const FWorkflo
 		];
 }
 
-FText CustomAssetEditorAppTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
+FText CustomAssetEditorAppTabFactoryProperties::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
 {
-	return FText::FromString(TEXT("A primary view for whatever"));
+	return FText::FromString(TEXT("Current object properties"));
 }
