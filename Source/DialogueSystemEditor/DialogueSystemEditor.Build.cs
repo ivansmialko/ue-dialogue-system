@@ -40,12 +40,12 @@ public class DialogueSystemEditor : ModuleRules
 				"SlateCore",
 				"DialogueSystemRuntime",
 				"AssetTools",
-				"UnrealEd"
+				"UnrealEd",
+				"PropertyEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
-		
-		
+
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{

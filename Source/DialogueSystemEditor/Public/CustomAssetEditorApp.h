@@ -3,11 +3,19 @@
 #include "CoreMinimal.h"
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
 
+class UCustomAsset;
+
 class CustomAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
+//private fields
+private:
+	UCustomAsset* WorkingAsset{ nullptr };
+
+//public methods
 public:
 	virtual void RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager) override;
 	void InitEditor(const EToolkitMode::Type InMode, const TSharedPtr<class IToolkitHost>& InToolkitHost, UObject* InCustomAsset);
+
 
 //Begin FAssetEditorToolkit interface
 	virtual FName GetToolkitFName() const override { return FName(TEXT("CustomAssetEditorApp")); }
@@ -19,4 +27,7 @@ public:
 	virtual void OnToolkitHostingFinished(const TSharedRef<class IToolkit>& InToolkit) override {}
 //End FAssetEditorToolkit interface
 
+//getters/setters
+public:
+	class UCustomAsset* GetWorkingAsset() const { return WorkingAsset;  }
 };

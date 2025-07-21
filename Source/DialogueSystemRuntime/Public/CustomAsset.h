@@ -7,4 +7,15 @@ UCLASS(BlueprintType)
 class DIALOGUESYSTEMRUNTIME_API UCustomAsset : public UObject
 {
 	GENERATED_BODY()
+
+//private fields
+private:
+	UPROPERTY(EditAnywhere)
+	FString AssetName;
+
+	UPROPERTY(EditAnywhere)
+	int32 AssetInteger;
+
+	UPROPERTY(EditAnywhere)
+	bool AssetBool;
 };
