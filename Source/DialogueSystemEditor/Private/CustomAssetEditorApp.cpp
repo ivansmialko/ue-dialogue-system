@@ -1,6 +1,9 @@
 #include "CustomAssetEditorApp.h"
-#include "CustomAssetEditorAppTabMode.h"
 #include "CustomAsset.h"
+#include "CustomAssetEditorAppTabMode.h"
+#include "CustomAssetEditorAppGraphSchema.h"
+
+#include "Kismet2/BlueprintEditorUtils.h"
 
 void CustomAssetEditorApp::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
 {
@@ -23,6 +26,7 @@ void CustomAssetEditorApp::InitEditor(const EToolkitMode::Type InMode, const TSh
 	);
 
 	WorkingAsset = Cast<UCustomAsset>(InCustomAsset);
+	WorkingGraph = FBlueprintEditorUtils::CreateNewGraph(WorkingAsset, NAME_None, UEdGraph::StaticClass(), UCustomGraphSchema::StaticClass());
 
 	AddApplicationMode(TEXT("CustomAssetEditorAppTabMode"), MakeShareable(new CustomAssetEditorAppTabMode(SharedThis(this))));
 	SetCurrentMode(TEXT("CustomAssetEditorAppTabMode"));

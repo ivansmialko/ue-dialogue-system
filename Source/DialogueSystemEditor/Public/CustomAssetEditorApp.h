@@ -4,12 +4,14 @@
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
 
 class UCustomAsset;
+class UEdGraph;
 
 class CustomAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
 //private fields
 private:
 	UCustomAsset* WorkingAsset{ nullptr };
+	UEdGraph* WorkingGraph{ nullptr };
 
 //public methods
 public:
@@ -29,5 +31,6 @@ public:
 
 //getters/setters
 public:
-	class UCustomAsset* GetWorkingAsset() const { return WorkingAsset;  }
+	UCustomAsset* GetWorkingAsset() const { return WorkingAsset;  }
+	UEdGraph* GetWorkingGraph() const { return WorkingGraph; }
 };

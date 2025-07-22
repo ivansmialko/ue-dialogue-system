@@ -3,6 +3,9 @@
 #include "CustomAsset.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
+#include "GraphEditor.h"
+#include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
+#include "Kismet2/KismetEditorUtilities.h"
 
 CustomAssetEditorAppTabFactoryGraph::CustomAssetEditorAppTabFactoryGraph(TSharedPtr<CustomAssetEditorApp> InApp):
 	FWorkflowTabFactory(FName("CustomAssetEditorAppTabFactoryGraph"), InApp)
@@ -22,8 +25,9 @@ TSharedRef<SWidget> CustomAssetEditorAppTabFactoryGraph::CreateTabBody(const FWo
 		.FillHeight(1.0f)
 		.HAlign(HAlign_Fill)
 		[
-			SNew(STextBlock)
-				.Text(FText::FromString(Application->GetWorkingAsset()->AssetName))
+			SNew(SGraphEditor)
+			.IsEditable(true)
+			.GraphToEdit(Application->GetWorkingGraph())
 		];
 }
 
