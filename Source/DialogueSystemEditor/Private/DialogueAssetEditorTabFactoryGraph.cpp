@@ -1,14 +1,14 @@
-#include "CustomAssetEditorAppTabFactoryGraph.h"
-#include "CustomAssetEditorApp.h"
-#include "CustomAsset.h"
+#include "DialogueAssetEditorTabFactoryGraph.h"
+#include "DialogueAssetEditorApp.h"
+#include "DialogueAsset.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
 #include "GraphEditor.h"
 #include "Editor/UnrealEd/Public/Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 
-CustomAssetEditorAppTabFactoryGraph::CustomAssetEditorAppTabFactoryGraph(TSharedPtr<CustomAssetEditorApp> InApp):
-	FWorkflowTabFactory(FName("CustomAssetEditorAppTabFactoryGraph"), InApp)
+DialogueAssetEditorTabFactoryGraph::DialogueAssetEditorTabFactoryGraph(TSharedPtr<DialogueAssetEditorApp> InApp):
+	FWorkflowTabFactory(FName("DialogueAssetEditorTabFactoryGraph"), InApp)
 {
 	App = InApp;
 	TabLabel = FText::FromString(TEXT("Graph editor"));
@@ -16,9 +16,9 @@ CustomAssetEditorAppTabFactoryGraph::CustomAssetEditorAppTabFactoryGraph(TShared
 	ViewMenuTooltip = FText::FromString(TEXT("Shows current dialogue graph editor"));
 }
 
-TSharedRef<SWidget> CustomAssetEditorAppTabFactoryGraph::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
+TSharedRef<SWidget> DialogueAssetEditorTabFactoryGraph::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
 {
-	const TSharedPtr<CustomAssetEditorApp> Application = App.Pin();
+	const TSharedPtr<DialogueAssetEditorApp> Application = App.Pin();
 
 	return SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
@@ -31,7 +31,7 @@ TSharedRef<SWidget> CustomAssetEditorAppTabFactoryGraph::CreateTabBody(const FWo
 		];
 }
 
-FText CustomAssetEditorAppTabFactoryGraph::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
+FText DialogueAssetEditorTabFactoryGraph::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
 {
 	return FText::FromString(TEXT("Dialogue graph editor"));
 }

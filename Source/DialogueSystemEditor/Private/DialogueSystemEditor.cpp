@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DialogueSystemEditor.h"
-#include "CustomAsset.h"
+#include "DialogueAsset.h"
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
 #include "Interfaces/IPluginManager.h"
@@ -11,8 +11,8 @@
 void FDialogueSystemEditorModule::StartupModule()
 {
 	IAssetTools& AssetToolsModule = IAssetTools::Get();
-	const EAssetTypeCategories::Type AssetType = AssetToolsModule.RegisterAdvancedAssetCategory(FName(TEXT("CustomAssets")), FText::FromString("Custom Assets"));
-	const TSharedPtr<CustomAssetAction> CustomAction = MakeShareable(new CustomAssetAction(AssetType));
+	const EAssetTypeCategories::Type AssetType = AssetToolsModule.RegisterAdvancedAssetCategory(FName(TEXT("DialogueSystem")), FText::FromString("Dialogue system"));
+	const TSharedPtr<DialogueAssetAction> CustomAction = MakeShareable(new DialogueAssetAction(AssetType));
 	AssetToolsModule.RegisterAssetTypeActions(CustomAction.ToSharedRef());
 
 	const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin("DialogueSystem");

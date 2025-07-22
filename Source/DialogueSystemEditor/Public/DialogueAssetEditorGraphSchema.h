@@ -3,10 +3,10 @@
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraph.h"
 
-#include "CustomAssetEditorAppGraphSchema.generated.h"
+#include "DialogueAssetEditorGraphSchema.generated.h"
 
 UCLASS()
-class UCustomGraphSchema : public UEdGraphSchema
+class UDialogueAssetEditorGraphSchema : public UEdGraphSchema
 {
 	GENERATED_BODY()
 

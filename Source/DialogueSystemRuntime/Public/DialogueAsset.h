@@ -1,10 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CustomAsset.generated.h"
+#include "DialogueAsset.generated.h"
 
 UCLASS(BlueprintType)
-class DIALOGUESYSTEMRUNTIME_API UCustomAsset : public UObject
+class DIALOGUESYSTEMRUNTIME_API UDialogueAsset : public UObject
 {
 	GENERATED_BODY()
 

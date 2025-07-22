@@ -3,14 +3,14 @@
 #include "CoreMinimal.h"
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
 
-class UCustomAsset;
+class UDialogueAsset;
 class UEdGraph;
 
-class CustomAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
+class DialogueAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
 //private fields
 private:
-	UCustomAsset* WorkingAsset{ nullptr };
+	UDialogueAsset* WorkingAsset{ nullptr };
 	UEdGraph* WorkingGraph{ nullptr };
 
 //public methods
@@ -20,9 +20,9 @@ public:
 
 
 //Begin FAssetEditorToolkit interface
-	virtual FName GetToolkitFName() const override { return FName(TEXT("CustomAssetEditorApp")); }
-	virtual FText GetBaseToolkitName() const override { return FText::FromString(TEXT("CustomAssetEditorApp")); }
-	virtual FString GetWorldCentricTabPrefix() const override { return TEXT("CustomAssetEditorApp"); }
+	virtual FName GetToolkitFName() const override { return FName(TEXT("DialogueAssetEditorApp")); }
+	virtual FText GetBaseToolkitName() const override { return FText::FromString(TEXT("DialogueAssetEditorApp")); }
+	virtual FString GetWorldCentricTabPrefix() const override { return TEXT("DialogueAssetEditorApp"); }
 	virtual FLinearColor GetWorldCentricTabColorScale() const override { return FLinearColor(0.3f, 0.2f, 0.5f, 0.5f); }
 	virtual FString GetDocumentationLink() const override { return TEXT("https://github.com/ivansmialko/ue-dialogue-system"); }
 	virtual void OnToolkitHostingStarted(const TSharedRef<class IToolkit>& InToolkit) override {}
@@ -31,6 +31,6 @@ public:
 
 //getters/setters
 public:
-	UCustomAsset* GetWorkingAsset() const { return WorkingAsset;  }
+	UDialogueAsset* GetWorkingAsset() const { return WorkingAsset;  }
 	UEdGraph* GetWorkingGraph() const { return WorkingGraph; }
 };

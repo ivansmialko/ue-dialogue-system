@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-#include "CustomAssetAction.h"
+#include "DialogueAssetAction.h"
 #include "Styling/SlateStyleRegistry.h"
 
 class FDialogueSystemEditorModule : public IModuleInterface

@@ -4,16 +4,16 @@
 #include "WorkflowOrientedApp/ApplicationMode.h"
 #include "WorkflowOrientedApp/WorkflowTabManager.h"
 
-class CustomAssetEditorAppTabMode : public FApplicationMode
+class DialogueAssetEditorTabModeMain : public FApplicationMode
 {
 public:
-	CustomAssetEditorAppTabMode(TSharedPtr<class CustomAssetEditorApp> InApp);
+	DialogueAssetEditorTabModeMain(TSharedPtr<class DialogueAssetEditorApp> InApp);
 	
 	virtual void RegisterTabFactories(TSharedPtr<class FTabManager> InTabManager) override;
 	virtual void PreDeactivateMode() override;
 	virtual void PostActivateMode() override;
 
 private:
-	TWeakPtr<CustomAssetEditorApp> App;
+	TWeakPtr<DialogueAssetEditorApp> App;
 	FWorkflowAllowedTabSet TabsSet;
 };

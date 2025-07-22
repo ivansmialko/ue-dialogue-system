@@ -2,14 +2,14 @@
 #include "CoreMinimal.h"
 #include "WorkflowOrientedApp/WorkflowTabFactory.h"
 
-class CustomAssetEditorAppTabFactoryGraph : public FWorkflowTabFactory
+class DialogueAssetEditorTabFactoryProperties : public FWorkflowTabFactory
 {
 public:
-	CustomAssetEditorAppTabFactoryGraph(TSharedPtr<class CustomAssetEditorApp> InApp);
+	DialogueAssetEditorTabFactoryProperties(TSharedPtr<class DialogueAssetEditorApp> InApp);
 
 	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const override;
 	virtual FText GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const override;
 
 private:
-	TWeakPtr<class CustomAssetEditorApp> App;
+	TWeakPtr<class DialogueAssetEditorApp> App;
 };

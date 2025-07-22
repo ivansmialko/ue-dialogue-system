@@ -1,11 +1,11 @@
-#include "CustomAssetEditorAppTabFactoryProperties.h"
-#include "CustomAssetEditorApp.h"
-#include "CustomAsset.h"
+#include "DialogueAssetEditorTabFactoryProperties.h"
+#include "DialogueAssetEditorApp.h"
+#include "DialogueAsset.h"
 #include "IDetailsView.h"
 #include "PropertyEditorModule.h"
 
-CustomAssetEditorAppTabFactoryProperties::CustomAssetEditorAppTabFactoryProperties(TSharedPtr<CustomAssetEditorApp> InApp):
-	FWorkflowTabFactory(FName("CustomAssetEditorAppTabFactoryProperties"), InApp)
+DialogueAssetEditorTabFactoryProperties::DialogueAssetEditorTabFactoryProperties(TSharedPtr<DialogueAssetEditorApp> InApp):
+	FWorkflowTabFactory(FName("DialogueAssetEditorTabFactoryProperties"), InApp)
 {
 	App = InApp;
 	TabLabel = FText::FromString(TEXT("Properties"));
@@ -13,9 +13,9 @@ CustomAssetEditorAppTabFactoryProperties::CustomAssetEditorAppTabFactoryProperti
 	ViewMenuTooltip = FText::FromString(TEXT("Shows current object properties"));
 }
 
-TSharedRef<SWidget> CustomAssetEditorAppTabFactoryProperties::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
+TSharedRef<SWidget> DialogueAssetEditorTabFactoryProperties::CreateTabBody(const FWorkflowTabSpawnInfo& InInfo) const
 {
-	const TSharedPtr<CustomAssetEditorApp> Application = App.Pin();
+	const TSharedPtr<DialogueAssetEditorApp> Application = App.Pin();
 	FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 
 	FDetailsViewArgs DetailsViewArgs;
@@ -41,7 +41,7 @@ TSharedRef<SWidget> CustomAssetEditorAppTabFactoryProperties::CreateTabBody(cons
 		];
 }
 
-FText CustomAssetEditorAppTabFactoryProperties::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
+FText DialogueAssetEditorTabFactoryProperties::GetTabToolTipText(const FWorkflowTabSpawnInfo& InInfo) const
 {
 	return FText::FromString(TEXT("Current object properties"));
 }

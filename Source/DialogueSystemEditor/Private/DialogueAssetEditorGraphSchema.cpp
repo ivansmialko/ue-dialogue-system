@@ -1,6 +1,6 @@
-#include "CustomAssetEditorAppGraphSchema.h"
+#include "DialogueAssetEditorGraphSchema.h"
 
-void UCustomGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
+void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
 {
 	TSharedPtr<FNewNodeAction> NewNodeAction
 	(
