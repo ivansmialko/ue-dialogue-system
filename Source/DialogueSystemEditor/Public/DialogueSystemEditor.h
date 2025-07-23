@@ -7,11 +7,14 @@
 #include "DialogueAssetAction.h"
 #include "Styling/SlateStyleRegistry.h"
 
+struct FDialogueAssetEditorGraphPinFactory;
+
 class FDialogueSystemEditorModule : public IModuleInterface
 {
 //private fields
 private:
 	TSharedPtr<FSlateStyleSet> StyleSet{ nullptr };
+	TSharedPtr<FDialogueAssetEditorGraphPinFactory> GraphNodePinFactory;
 
 //public methods
 public:

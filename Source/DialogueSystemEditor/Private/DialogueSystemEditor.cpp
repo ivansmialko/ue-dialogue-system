@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DialogueSystemEditor.h"
-#include "DialogueAsset.h"
+#include "DialogueAssetEditorGraphPin.h"
+#include "EdGraphUtilities.h"
 #include "IAssetTools.h"
-#include "AssetToolsModule.h"
 #include "Interfaces/IPluginManager.h"
 
 #define LOCTEXT_NAMESPACE "FDialogueSystemEditorModule"
@@ -32,6 +32,9 @@ void FDialogueSystemEditorModule::StartupModule()
 	StyleSet->Set(TEXT("DialogueAssetEditor.NodeDelete"), NodeDeleteIcon);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
+
+	GraphNodePinFactory = MakeShareable(new FDialogueAssetEditorGraphPinFactory());
+	FEdGraphUtilities::RegisterVisualPinFactory(GraphNodePinFactory);
 }
 
 void FDialogueSystemEditorModule::ShutdownModule()
@@ -40,6 +43,7 @@ void FDialogueSystemEditorModule::ShutdownModule()
 		return;
 
 	FSlateStyleRegistry::UnRegisterSlateStyle(*StyleSet);
+	FEdGraphUtilities::RegisterVisualPinFactory(GraphNodePinFactory);
 }
 
 #undef LOCTEXT_NAMESPACE
