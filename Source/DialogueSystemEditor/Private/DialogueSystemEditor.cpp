@@ -22,9 +22,14 @@ void FDialogueSystemEditorModule::StartupModule()
 
 	FSlateImageBrush* ThumbnailBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("dialogue_thumbnail"), TEXT(".png")), FVector2D(128.0, 128.0));
 	FSlateImageBrush* IconBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("dialogue_icon"), TEXT(".png")), FVector2D(128.0, 128.0));
-	FSlateImageBrush* NodeIconAdd = new FSlateImageBrush();
+	FSlateImageBrush* NodePinAddIcon = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("node_pin_add"), TEXT(".png")), FVector2D(128.0, 128.0));
+	FSlateImageBrush* NodePinDeleteIcon = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("node_pin_delete"), TEXT(".png")), FVector2D(128.0, 128.0));
+	FSlateImageBrush* NodeDeleteIcon = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("node_delete"), TEXT(".png")), FVector2D(128.0, 128.0));
 	StyleSet->Set(TEXT("ClassThumbnail.DialogueAsset"), ThumbnailBrush);
 	StyleSet->Set(TEXT("ClassIcon.DialogueAsset"), IconBrush);
+	StyleSet->Set(TEXT("DialogueAssetEditor.NodePinAddIcon"), NodePinAddIcon);
+	StyleSet->Set(TEXT("DialogueAssetEditor.NodePinRemoveIcon"), NodePinDeleteIcon);
+	StyleSet->Set(TEXT("DialogueAssetEditor.NodeDelete"), NodeDeleteIcon);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
 }

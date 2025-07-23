@@ -1,4 +1,5 @@
 #include "DialogueAssetEditorGraphSchema.h"
+#include "DialogueAssetEditorGraphNode.h"
 
 void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
 {
@@ -28,14 +29,9 @@ FNewNodeAction::FNewNodeAction(const FText& InNodeCategory, const FText& InMenuD
 UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin,
 	const FVector2f& Location, bool bSelectNewNode)
 {
-	UEdGraphNode* NewNode = NewObject<UEdGraphNode>(ParentGraph);
+	UEdGraphNode* NewNode = NewObject<UDialogueAssetEditorGraphNode>(ParentGraph);
 	NewNode->NodePosX = Location.X;
 	NewNode->NodePosY = Location.Y;
-
-	NewNode->CreatePin(EGPD_Input, TEXT("Inputs"), TEXT("Input"));
-	NewNode->CreatePin(EGPD_Output, TEXT("Outputs"), TEXT("Output 1"));
-	NewNode->CreatePin(EGPD_Output, TEXT("Outputs"), TEXT("Output 2"));
-
 	ParentGraph->Modify();
 	ParentGraph->AddNode(NewNode, true, true);
 
