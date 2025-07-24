@@ -64,7 +64,7 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 UEdGraphPin* UDialogueAssetEditorGraphNode::CreateCustomPin(const EEdGraphPinDirection& InDirection, FName InName)
 {
 	const FName Category = (InDirection == EGPD_Input ? TEXT("Inputs") : TEXT("Outputs"));
-	const FName Subcategory = TEXT("Custom pin");
+	const FName Subcategory = TEXT("DialogueSystemInputPin");
 
 	UEdGraphPin* Pin = CreatePin(InDirection, Category, InName);
 	Pin->PinType.PinSubCategory = Subcategory;

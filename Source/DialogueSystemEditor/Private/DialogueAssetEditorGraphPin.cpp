@@ -18,7 +18,7 @@ FDialogueAssetEditorGraphPinFactory::~FDialogueAssetEditorGraphPinFactory()
 
 TSharedPtr<SGraphPin> FDialogueAssetEditorGraphPinFactory::CreatePin(class UEdGraphPin* InPin) const
 {
-	if (FName(TEXT("CustomPin")) == InPin->PinType.PinSubCategory)
+	if (FName(TEXT("DialogueSystemInputPin")) == InPin->PinType.PinSubCategory)
 	{
 		return SNew(SDialogueAssetEditorGraphPin, InPin);
 	}
