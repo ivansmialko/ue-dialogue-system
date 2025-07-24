@@ -13,6 +13,7 @@ class UDialogueAssetEditorGraphSchema : public UEdGraphSchema
 //public methods
 public:
 	virtual void GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const override;
+	virtual const FPinConnectionResponse CanCreateConnection(const UEdGraphPin* InA, const UEdGraphPin* InB) const override;
 };
 
 USTRUCT()

@@ -5,8 +5,6 @@
 
 UDialogueAssetEditorGraphNode::UDialogueAssetEditorGraphNode()
 {
-	CreatePin(EGPD_Input, TEXT("Inputs"), TEXT("Input"));
-	CreatePin(EGPD_Output, TEXT("Outputs"), TEXT("Default output"));
 }
 
 void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
@@ -23,7 +21,7 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 		FSlateIcon(TEXT("DialogEditorStyle"), TEXT("DialogueAssetEditor.NodePinAddIcon")),
 		FUIAction(FExecuteAction::CreateLambda([ThisNode]()
 			{
-				ThisNode->CreatePin(EGPD_Output, TEXT("Outputs"), TEXT("Another output"));
+				ThisNode->CreateCustomPin(EGPD_Output, TEXT("Output"));
 				ThisNode->GetGraph()->NotifyGraphChanged();
 				ThisNode->GetGraph()->Modify();
 			}))
@@ -61,4 +59,15 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 				ThisNode->GetGraph()->RemoveNode(ThisNode);
 			}))
 	);
+}
+
+UEdGraphPin* UDialogueAssetEditorGraphNode::CreateCustomPin(const EEdGraphPinDirection& InDirection, FName InName)
+{
+	const FName Category = (InDirection == EGPD_Input ? TEXT("Inputs") : TEXT("Outputs"));
+	const FName Subcategory = TEXT("Custom pin");
+
+	UEdGraphPin* Pin = CreatePin(InDirection, Category, InName);
+	Pin->PinType.PinSubCategory = Subcategory;
+
+	return Pin;
 }

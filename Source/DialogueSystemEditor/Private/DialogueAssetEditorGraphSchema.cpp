@@ -17,6 +17,21 @@ void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBu
 	InContextMenuBuilder.AddAction(NewNodeAction);
 }
 
+const FPinConnectionResponse UDialogueAssetEditorGraphSchema::CanCreateConnection(const UEdGraphPin* InA,
+	const UEdGraphPin* InB) const
+{
+	if (!InA || !InB)
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT("Invalid pins"));
+
+	if (InA->Direction == InB->Direction)
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT("Inputs can only connect to outputs"));
+
+	if (InA->GetOwningNode() == InB->GetOwningNode())
+		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT("Can't connect to itself"));	
+
+	return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_AB, TEXT(""));
+}
+
 FNewNodeAction::FNewNodeAction()
 {
 }
@@ -29,9 +44,15 @@ FNewNodeAction::FNewNodeAction(const FText& InNodeCategory, const FText& InMenuD
 UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin,
 	const FVector2f& Location, bool bSelectNewNode)
 {
-	UEdGraphNode* NewNode = NewObject<UDialogueAssetEditorGraphNode>(ParentGraph);
+	UDialogueAssetEditorGraphNode* NewNode = NewObject<UDialogueAssetEditorGraphNode>(ParentGraph);
 	NewNode->NodePosX = Location.X;
 	NewNode->NodePosY = Location.Y;
+	NewNode->CreateNewGuid();
+
+	UEdGraphPin* InputPin = NewNode->CreateCustomPin(EGPD_Input, TEXT("Input"));
+	NewNode->CreateCustomPin(EGPD_Output, TEXT("Output"));
+	NewNode->GetSchema()->TryCreateConnection(InputPin, FromPin);
+
 	ParentGraph->Modify();
 	ParentGraph->AddNode(NewNode, true, true);
 

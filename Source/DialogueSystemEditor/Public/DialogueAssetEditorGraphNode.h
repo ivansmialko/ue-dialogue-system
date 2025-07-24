@@ -19,4 +19,6 @@ public:
 	virtual FLinearColor GetNodeTitleColor() const override { return FLinearColor(FColor::Green); }
 	virtual bool CanUserDeleteNode() const override { return true; }
 	virtual void GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const override;
+
+	UEdGraphPin* CreateCustomPin(const EEdGraphPinDirection& InDirection, FName InName);
 };
