@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "DialogueAsset.generated.h"
 
+class UDialogueGraph;
+
 UCLASS(BlueprintType)
 class DIALOGUESYSTEMRUNTIME_API UDialogueAsset : public UObject
 {
@@ -18,4 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool AssetBool;
+
+	UPROPERTY()
+	UDialogueGraph* Graph{ nullptr };
 };

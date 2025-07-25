@@ -29,6 +29,10 @@ public:
 	virtual void OnToolkitHostingFinished(const TSharedRef<class IToolkit>& InToolkit) override {}
 //End FAssetEditorToolkit interface
 
+protected:
+	void UpdateWorkingAsset() const;
+	void UpdateWorkingGraph();
+
 //getters/setters
 public:
 	UDialogueAsset* GetWorkingAsset() const { return WorkingAsset;  }
