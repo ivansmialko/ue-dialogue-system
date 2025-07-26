@@ -13,11 +13,17 @@ private:
 	UDialogueAsset* WorkingAsset{ nullptr };
 	UEdGraph* WorkingGraph{ nullptr };
 
+	FDelegateHandle OnGraphChangeDlg;
+
 //public methods
 public:
-	virtual void RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager) override;
 	void InitEditor(const EToolkitMode::Type InMode, const TSharedPtr<class IToolkitHost>& InToolkitHost, UObject* InCustomAsset);
+	void OnGraphChangeHandler(const FEdGraphEditAction& InEditAction) const;
 
+//Begin FWorkflowCentricApplication interface
+	virtual void RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager) override;
+	virtual void OnClose() override;
+//End FWorkflowCentricApplication interface
 
 //Begin FAssetEditorToolkit interface
 	virtual FName GetToolkitFName() const override { return FName(TEXT("DialogueAssetEditorApp")); }
@@ -31,7 +37,7 @@ public:
 
 protected:
 	void UpdateWorkingAsset() const;
-	void UpdateWorkingGraph();
+	void UpdateWorkingGraph() const;
 
 //getters/setters
 public:

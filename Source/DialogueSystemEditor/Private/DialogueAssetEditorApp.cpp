@@ -1,15 +1,11 @@
 #include "DialogueAssetEditorApp.h"
 #include "DialogueAsset.h"
+#include "DialogueAssetEditorGraphNode.h"
 #include "DialogueGraph.h"
 #include "DialogueAssetEditorTabModeMain.h"
 #include "DialogueAssetEditorGraphSchema.h"
 
 #include "Kismet2/BlueprintEditorUtils.h"
-
-void DialogueAssetEditorApp::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
-{
-	FWorkflowCentricApplication::RegisterTabSpawners(InTabManager);
-}
 
 void DialogueAssetEditorApp::InitEditor(const EToolkitMode::Type InMode, const TSharedPtr<class IToolkitHost>& InToolkitHost, UObject* InCustomAsset)
 {
@@ -31,6 +27,28 @@ void DialogueAssetEditorApp::InitEditor(const EToolkitMode::Type InMode, const T
 
 	AddApplicationMode(TEXT("DialogueAssetEditorTabModeMain"), MakeShareable(new DialogueAssetEditorTabModeMain(SharedThis(this))));
 	SetCurrentMode(TEXT("DialogueAssetEditorTabModeMain"));
+
+	UpdateWorkingGraph();
+
+	OnGraphChangeDlg = WorkingGraph->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &DialogueAssetEditorApp::OnGraphChangeHandler));
+}
+
+void DialogueAssetEditorApp::OnGraphChangeHandler(const FEdGraphEditAction& InEditAction) const
+{
+	UpdateWorkingAsset();
+}
+
+void DialogueAssetEditorApp::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
+{
+	FWorkflowCentricApplication::RegisterTabSpawners(InTabManager);
+}
+
+void DialogueAssetEditorApp::OnClose()
+{
+	UpdateWorkingAsset();
+	WorkingGraph->RemoveOnGraphChangedHandler(OnGraphChangeDlg);
+
+	FAssetEditorToolkit::OnClose();
 }
 
 void DialogueAssetEditorApp::UpdateWorkingAsset() const
@@ -47,10 +65,11 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 	TArray<std::pair<FGuid, FGuid>> Connections;
 	TMap<FGuid, UDialogueGraphPin*>  IdToPinMap;
 
-	for (UEdGraphNode* EditorNode : WorkingGraph->Nodes)
+	//Read all the nodes and pins from editor graph, create runtime nodes
+	for (const UEdGraphNode* EditorNode : WorkingGraph->Nodes)
 	{
 		UDialogueGraphNode* GraphNode = NewObject<UDialogueGraphNode>(DialogueGraph);
-		GrapNode->Position = FVector2D(EditorNode->NodePosX, EditorNode->NodePosY);
+		GraphNode->Position = FVector2D(EditorNode->NodePosX, EditorNode->NodePosY);
 
 		for (UEdGraphPin* EditorNodePin : EditorNode->Pins)
 		{
@@ -58,22 +77,101 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 			GraphPin->Name = EditorNodePin->PinName;
 			GraphPin->Id = EditorNodePin->PinId;
 
-			if (EditorNodePin->HasAnyConnections() && EditorNodePin->Direction == EEdGraphPinDirection::EGPD_Output)
+			switch (EditorNodePin->Direction)
 			{
-				std::pair<FGuid, FGuid> Connection = std::make_pair(EditorNodePin->PinId, EditorNodePin->LinkedTo[0]->PinId);
-				Connections.Add(Connection);
+			case EGPD_Input:
+			{
+				if (!GraphNode->Input)
+				{
+					GraphNode->Input = GraphPin;
+				}
+			} break;
+			case EGPD_Output:
+			{
+				if (EditorNodePin->HasAnyConnections())
+				{
+					std::pair<FGuid, FGuid> Connection = std::make_pair(EditorNodePin->PinId, EditorNodePin->LinkedTo[0]->PinId);
+					Connections.Add(Connection);
+				}
+
+				GraphNode->Outputs.Add(GraphPin);
+			} break;
+			default: break;
 			}
 
-			IdToPinMap[EditorNodePin->PinId] = GraphPin;
-			if (EditorNodePin->Direction == EEdGraphPinDirection::EGPD_Input)
-			{
-				GraphPin->Input = EditorNodePin;
-			}
+			IdToPinMap.Add(EditorNodePin->PinId, GraphPin);
 		}
+
+		DialogueGraph->Nodes.Add(GraphNode);
+	}
+
+	//Set-up connections between pins
+	for (const auto& [IdPinA, IdPinB] : Connections)
+	{
+		UDialogueGraphPin* PinA = IdToPinMap[IdPinA];
+		UDialogueGraphPin* PinB = IdToPinMap[IdPinB];
+
+		PinA->Connection = PinB;
 	}
 }
 
-void DialogueAssetEditorApp::UpdateWorkingGraph()
+void DialogueAssetEditorApp::UpdateWorkingGraph() const
 {
+	if (!WorkingGraph)
+		return;
 
+	if (!WorkingAsset || !WorkingAsset->Graph)
+		return;
+
+	TArray<std::pair<FGuid, FGuid>> Connections;
+	TMap<FGuid, UEdGraphPin*> IdToPinMap;
+
+	//Read all the nodes and pins from runtime graph, build editor graph nodes
+	for (const UDialogueGraphNode* GraphNode : WorkingAsset->Graph->Nodes)
+	{
+		UDialogueAssetEditorGraphNode* EditorNode = NewObject<UDialogueAssetEditorGraphNode>(WorkingGraph);
+		EditorNode->CreateNewGuid();
+		EditorNode->NodePosX = GraphNode->Position.X;
+		EditorNode->NodePosY = GraphNode->Position.Y;
+
+		//Build input pin, record connection
+		if (UDialogueGraphPin* GraphNodeInputPin = GraphNode->Input)
+		{
+			UEdGraphPin* EditorNodePin = EditorNode->CreateCustomPin(EEdGraphPinDirection::EGPD_Input, GraphNodeInputPin->Name);
+			EditorNodePin->PinId = GraphNodeInputPin->Id;
+
+			if (GraphNodeInputPin->Connection)
+			{
+				Connections.Add(std::make_pair(GraphNodeInputPin->Id, GraphNodeInputPin->Connection->Id));
+			}
+
+			IdToPinMap.Add(GraphNodeInputPin->Id, EditorNodePin);
+		}
+
+		//Build output pins, record connections
+		for (const UDialogueGraphPin* GraphNodeOutputPin : GraphNode->Outputs)
+		{
+			UEdGraphPin* EditorNodePin = EditorNode->CreateCustomPin(EEdGraphPinDirection::EGPD_Output, GraphNodeOutputPin->Name);
+			EditorNodePin->PinId = GraphNodeOutputPin->Id;
+
+			if (GraphNodeOutputPin->Connection)
+			{
+				Connections.Add(std::make_pair(GraphNodeOutputPin->Id, GraphNodeOutputPin->Connection->Id));
+			}
+
+			IdToPinMap.Add(GraphNodeOutputPin->Id, EditorNodePin);
+		}
+
+		WorkingGraph->AddNode(EditorNode);
+	}
+
+	//Set-up connections between pins
+	for (const auto& [IdPinA, IdPinB] : Connections)
+	{
+		UEdGraphPin* PinA = IdToPinMap[IdPinA];
+		UEdGraphPin* PinB = IdToPinMap[IdPinB];
+
+		PinA->LinkedTo.Add(PinB);
+		PinB->LinkedTo.Add(PinA);
+	}
 }
