@@ -20,7 +20,8 @@ private:
 //public methods
 public:
 	UDialogueAssetEditorGraphNode();
-	UEdGraphPin* CreateCustomPin(const EEdGraphPinDirection& InDirection, FName InName);
+	UEdGraphPin* CreateDialoguePin(const EEdGraphPinDirection& InDirection, FName InName);
+	void SyncPinsWithResponses();
 
 //Begin UEdGraphNode interface
 	virtual FText GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const override;

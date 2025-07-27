@@ -23,41 +23,38 @@ void DialogueAssetEditorApp::InitEditor(const EToolkitMode::Type InMode, const T
 	);
 
 	WorkingAsset = Cast<UDialogueAsset>(InCustomAsset);
+	WorkingAsset->SetPreSaveListener([this]() { OnWorkingAssetPreSave(); });
+
 	WorkingGraph = FBlueprintEditorUtils::CreateNewGraph(WorkingAsset, NAME_None, UEdGraph::StaticClass(), UDialogueAssetEditorGraphSchema::StaticClass());
 
 	AddApplicationMode(TEXT("DialogueAssetEditorTabModeMain"), MakeShareable(new DialogueAssetEditorTabModeMain(SharedThis(this))));
 	SetCurrentMode(TEXT("DialogueAssetEditorTabModeMain"));
 
 	UpdateWorkingGraph();
-
-	OnGraphChangeDlg = WorkingGraph->AddOnGraphChangedHandler(FOnGraphChanged::FDelegate::CreateSP(this, &DialogueAssetEditorApp::OnGraphChangeHandler));
 }
 
-void DialogueAssetEditorApp::OnGraphChangeHandler(const FEdGraphEditAction& InEditAction) const
+void DialogueAssetEditorApp::OnWorkingAssetPreSave() const
 {
+	//Update working asset from the graph just before saving it
 	UpdateWorkingAsset();
 }
 
 void DialogueAssetEditorApp::OnGraphSelectionHandler(const FGraphPanelSelectionSet& InSelection) const
 {
-	//Find the first graph node if any
-	for (UObject* Object : InSelection)
-	{
-		UDialogueAssetEditorGraphNode* EditorNode = Cast<UDialogueAssetEditorGraphNode>(Object);
-		if (!EditorNode)
-			continue;
-
-		SelectedNodeDetailsView->SetObject(EditorNode->GetNodeData());
-		return;
-	}
-
-	SelectedNodeDetailsView->SetObject(nullptr);
+	const UDialogueAssetEditorGraphNode* SelectedNode = GetSelectedNode(InSelection);
+	SelectedNodeDetailsView->SetObject(SelectedNode ? SelectedNode->GetNodeData() : nullptr);
 }
 
 void DialogueAssetEditorApp::OnNodeDetailsViewUpdated(const FPropertyChangedEvent& InEvent) const
 {
 	if (!WorkingGraphUi)
 		return;
+
+	UDialogueAssetEditorGraphNode* SelectedNode = GetSelectedNode(WorkingGraphUi->GetSelectedNodes());
+	if (!SelectedNode)
+		return;
+
+	SelectedNode->SyncPinsWithResponses();
 
 	WorkingGraphUi->NotifyGraphChanged();
 }
@@ -70,7 +67,7 @@ void DialogueAssetEditorApp::RegisterTabSpawners(const TSharedRef<class FTabMana
 void DialogueAssetEditorApp::OnClose()
 {
 	UpdateWorkingAsset();
-	WorkingGraph->RemoveOnGraphChangedHandler(OnGraphChangeDlg);
+	WorkingAsset->SetPreSaveListener(nullptr);
 
 	FAssetEditorToolkit::OnClose();
 }
@@ -175,7 +172,7 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 		//Build input pin, record connection
 		if (UDialogueGraphPin* GraphNodeInputPin = GraphNode->Input)
 		{
-			UEdGraphPin* EditorNodePin = EditorNode->CreateCustomPin(EEdGraphPinDirection::EGPD_Input, GraphNodeInputPin->Name);
+			UEdGraphPin* EditorNodePin = EditorNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Input, GraphNodeInputPin->Name);
 			EditorNodePin->PinId = GraphNodeInputPin->Id;
 
 			if (GraphNodeInputPin->Connection)
@@ -189,7 +186,7 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 		//Build output pins, record connections
 		for (const UDialogueGraphPin* GraphNodeOutputPin : GraphNode->Outputs)
 		{
-			UEdGraphPin* EditorNodePin = EditorNode->CreateCustomPin(EEdGraphPinDirection::EGPD_Output, GraphNodeOutputPin->Name);
+			UEdGraphPin* EditorNodePin = EditorNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, GraphNodeOutputPin->Name);
 			EditorNodePin->PinId = GraphNodeOutputPin->Id;
 
 			if (GraphNodeOutputPin->Connection)
@@ -212,6 +209,22 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 		PinA->LinkedTo.Add(PinB);
 		PinB->LinkedTo.Add(PinA);
 	}
+}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+UDialogueAssetEditorGraphNode* DialogueAssetEditorApp::GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const
+{
+	//Find the first graph node if any
+	for (UObject* Object : InSelection)
+	{
+		UDialogueAssetEditorGraphNode* EditorNode = Cast<UDialogueAssetEditorGraphNode>(Object);
+		if (!EditorNode)
+			continue;
+
+		return EditorNode;
+	}
+
+	return nullptr;
 }
 
 void DialogueAssetEditorApp::SetSelectedNodeDetailView(const TSharedPtr<IDetailsView>& InDetailsView)

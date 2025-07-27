@@ -11,8 +11,22 @@ UDialogueAssetEditorGraphNode::UDialogueAssetEditorGraphNode()
 
 FText UDialogueAssetEditorGraphNode::GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const
 {
-	if (!NodeData || NodeData->Title.IsEmpty())
-		return FText::FromString(TEXT("Dialogue node"));
+	if (!NodeData)
+		return FText::FromString("Dialogue node");
+
+	if (NodeData->Title.IsEmpty() && NodeData->Text.IsEmpty())
+		return FText::FromString("Dialogue node");
+
+	if (NodeData->Title.IsEmpty() && !NodeData->Text.IsEmpty())
+	{
+		FString NodeTitle = NodeData->Text.ToString();
+		if (NodeTitle.Len() > 15)
+		{
+			NodeTitle = NodeTitle.Left(15) + TEXT("...");
+		}
+
+		return FText::FromString(NodeTitle);
+	}
 
 	return NodeData->Title;
 }
@@ -26,12 +40,14 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 	MenuSection.AddMenuEntry
 	(
 		TEXT("NodePinAdd"),
-		FText::FromString(TEXT("Add pin")),
-		FText::FromString(TEXT("Creates a new pin")),
+		FText::FromString(TEXT("Add Response")),
+		FText::FromString(TEXT("Creates a new response")),
 		FSlateIcon(TEXT("DialogEditorStyle"), TEXT("DialogueAssetEditor.NodePinAddIcon")),
 		FUIAction(FExecuteAction::CreateLambda([ThisNode]()
 			{
-				ThisNode->CreateCustomPin(EGPD_Output, TEXT("Output"));
+				ThisNode->GetNodeData()->Responses.Add(FText::FromString(TEXT("Response")));
+				ThisNode->SyncPinsWithResponses();
+
 				ThisNode->GetGraph()->NotifyGraphChanged();
 				ThisNode->GetGraph()->Modify();
 			}))
@@ -40,8 +56,8 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 	MenuSection.AddMenuEntry
 	(
 		TEXT("NodePinRemove"),
-		FText::FromString(TEXT("Remove pin")),
-		FText::FromString(TEXT("Removes a last pin from the node")),
+		FText::FromString(TEXT("Remove Response")),
+		FText::FromString(TEXT("Removes a last response from the node")),
 		FSlateIcon(TEXT("DialogEditorStyle"), TEXT("DialogueAssetEditor.NodePinRemoveIcon")),
 		FUIAction(FExecuteAction::CreateLambda([ThisNode]()
 			{
@@ -50,7 +66,10 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 					UEdGraphPin* LastPin = ThisNode->GetPinAt(ThisNode->Pins.Num() - 1);
 					if (LastPin && LastPin->Direction != EGPD_Input)
 					{
-						ThisNode->RemovePin(LastPin);
+						UDialogueNodeData* NodeData = ThisNode->GetNodeData();
+						NodeData->Responses.RemoveAt(NodeData->Responses.Num() - 1);
+
+						ThisNode->SyncPinsWithResponses();
 						ThisNode->GetGraph()->NotifyGraphChanged();
 						ThisNode->GetGraph()->Modify();
 					}
@@ -71,7 +90,7 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 	);
 }
 
-UEdGraphPin* UDialogueAssetEditorGraphNode::CreateCustomPin(const EEdGraphPinDirection& InDirection, FName InName)
+UEdGraphPin* UDialogueAssetEditorGraphNode::CreateDialoguePin(const EEdGraphPinDirection& InDirection, const FName InName)
 {
 	const FName Category = (InDirection == EGPD_Input ? TEXT("Inputs") : TEXT("Outputs"));
 	const FName Subcategory = TEXT("DialogueSystemInputPin");
@@ -80,4 +99,32 @@ UEdGraphPin* UDialogueAssetEditorGraphNode::CreateCustomPin(const EEdGraphPinDir
 	Pin->PinType.PinSubCategory = Subcategory;
 
 	return Pin;
+}
+
+void UDialogueAssetEditorGraphNode::SyncPinsWithResponses()
+{
+	//Sync the pins with the dialogue responses array
+	//We're going to assume the first pin is always the input pin
+
+	int NumPins = Pins.Num() - 1;
+	int NumDataPins = NodeData->Responses.Num();
+
+	while (NumPins > NumDataPins)
+	{
+		RemovePinAt(NumPins - 1, EGPD_Output);
+		--NumPins;
+	}
+
+	while (NumDataPins > NumPins)
+	{
+		CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(NodeData->Responses[NumPins].ToString()));
+		++NumPins;
+	}
+
+	int Index = 1;
+	for (const FText& Response : NodeData->Responses)
+	{
+		GetPinAt(Index)->PinName = FName(Response.ToString());
+		++Index;
+	}
 }

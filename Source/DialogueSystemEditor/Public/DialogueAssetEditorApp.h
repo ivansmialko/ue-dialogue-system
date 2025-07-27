@@ -7,6 +7,7 @@
 class UDialogueAsset;
 class UEdGraph;
 class IDetailsView;
+class UDialogueAssetEditorGraphNode;
 
 class DialogueAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
@@ -19,12 +20,10 @@ private:
 	TSharedPtr<SGraphEditor> WorkingGraphUi{ nullptr };
 	TSharedPtr<IDetailsView> SelectedNodeDetailsView{ nullptr };
 
-	FDelegateHandle OnGraphChangeDlg;
-
 //public methods
 public:
 	void InitEditor(const EToolkitMode::Type InMode, const TSharedPtr<class IToolkitHost>& InToolkitHost, UObject* InCustomAsset);
-	void OnGraphChangeHandler(const FEdGraphEditAction& InEditAction) const;
+	void OnWorkingAssetPreSave() const;
 	void OnGraphSelectionHandler(const FGraphPanelSelectionSet& InSelection) const;
 	void OnNodeDetailsViewUpdated(const FPropertyChangedEvent& InEvent) const;
 
@@ -46,6 +45,8 @@ public:
 protected:
 	void UpdateWorkingAsset() const;
 	void UpdateWorkingGraph() const;
+	UDialogueAssetEditorGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const;
+	
 
 //getters/setters
 public:

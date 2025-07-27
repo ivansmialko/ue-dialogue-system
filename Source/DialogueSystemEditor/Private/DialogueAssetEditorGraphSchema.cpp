@@ -51,9 +51,15 @@ UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGrap
 	NewNode->CreateNewGuid();
 	NewNode->SetNodeData(NewObject<UDialogueNodeData>(NewNode));
 
-	UEdGraphPin* InputPin = NewNode->CreateCustomPin(EGPD_Input, TEXT("Input"));
-	NewNode->CreateCustomPin(EGPD_Output, TEXT("Output"));
-	NewNode->GetSchema()->TryCreateConnection(InputPin, FromPin);
+	UEdGraphPin* InputPin = NewNode->CreateDialoguePin(EGPD_Input, TEXT("Display"));
+	FString DefaultResponse = TEXT("Response");
+	NewNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(DefaultResponse));
+	NewNode->GetNodeData()->Responses.Add(FText::FromString(DefaultResponse));
+
+	if (FromPin)
+	{
+		NewNode->GetSchema()->TryCreateConnection(InputPin, FromPin);
+	}
 
 	ParentGraph->Modify();
 	ParentGraph->AddNode(NewNode, true, true);
