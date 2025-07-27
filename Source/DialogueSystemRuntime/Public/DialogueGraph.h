@@ -9,6 +9,14 @@
 
 class UDialogueNodeData;
 
+UENUM()
+enum class EDialogueNode : uint8
+{
+	EDN_Start,
+	EDN_Dialogue,
+	EDN_End
+};
+
 UCLASS()
 class DIALOGUESYSTEMRUNTIME_API UDialogueGraphPin : public UObject
 {
@@ -42,6 +50,9 @@ public:
 
 	UPROPERTY()
 	UDialogueNodeData* Data;
+
+	UPROPERTY()
+	EDialogueNode Type{ EDialogueNode::EDN_Dialogue };
 };
 
 UCLASS()

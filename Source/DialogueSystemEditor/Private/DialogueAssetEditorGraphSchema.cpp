@@ -1,5 +1,6 @@
 #include "DialogueAssetEditorGraphSchema.h"
 #include "DialogueAssetEditorGraphNode.h"
+#include "DialogueAssetEditorGraphNodeStart.h"
 #include "DialogueNodeData.h"
 
 void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
@@ -31,6 +32,19 @@ const FPinConnectionResponse UDialogueAssetEditorGraphSchema::CanCreateConnectio
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, TEXT("Can't connect to itself"));	
 
 	return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_AB, TEXT(""));
+}
+
+void UDialogueAssetEditorGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
+{
+	UDialogueAssetEditorGraphNodeStart* StartNode = NewObject<UDialogueAssetEditorGraphNodeStart>(&Graph);
+	StartNode->CreateNewGuid();
+	StartNode->NodePosX = 0;
+	StartNode->NodePosY = 0;
+
+	StartNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(TEXT("Start")));
+
+	Graph.AddNode(StartNode, true, true);
+	Graph.Modify();
 }
 
 FNewNodeAction::FNewNodeAction()

@@ -1,11 +1,14 @@
 #include "DialogueAssetEditorApp.h"
 #include "DialogueAsset.h"
 #include "DialogueAssetEditorGraphNode.h"
+#include "DialogueAssetEditorGraphNodeStart.h"
 #include "DialogueGraph.h"
 #include "DialogueAssetEditorTabModeMain.h"
 #include "DialogueAssetEditorGraphSchema.h"
 
 #include "Kismet2/BlueprintEditorUtils.h"
+
+DEFINE_LOG_CATEGORY_STATIC(DialogueAssetEditorAppSub, Log, All)
 
 void DialogueAssetEditorApp::InitEditor(const EToolkitMode::Type InMode, const TSharedPtr<class IToolkitHost>& InToolkitHost, UObject* InCustomAsset)
 {
@@ -89,13 +92,8 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 	//Read all the nodes and pins from editor graph, create runtime nodes
 	for (UEdGraphNode* EditorNode : WorkingGraph->Nodes)
 	{
-		const UDialogueAssetEditorGraphNode* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNode>(EditorNode);
-		if (!DialogueEditorNode)
-			continue;
-
 		UDialogueGraphNode* GraphNode = NewObject<UDialogueGraphNode>(DialogueGraph);
 		GraphNode->Position = FVector2D(EditorNode->NodePosX, EditorNode->NodePosY);
-		GraphNode->Data = DialogueEditorNode->GetNodeData();
 
 		for (UEdGraphPin* EditorNodePin : EditorNode->Pins)
 		{
@@ -125,6 +123,17 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 			default: break;
 			}
 
+			if (EditorNode->IsA(UDialogueAssetEditorGraphNode::StaticClass()))
+			{
+				const UDialogueAssetEditorGraphNode* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNode>(EditorNode);
+				GraphNode->Type = EDialogueNode::EDN_Dialogue;
+				GraphNode->Data = DialogueEditorNode->GetNodeData();
+			}
+			else if (EditorNode->IsA(UDialogueAssetEditorGraphNodeStart::StaticClass()))
+			{
+				GraphNode->Type = EDialogueNode::EDN_Start;
+			}
+
 			IdToPinMap.Add(EditorNodePin->PinId, GraphPin);
 		}
 
@@ -146,8 +155,14 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 	if (!WorkingGraph)
 		return;
 
-	if (!WorkingAsset || !WorkingAsset->Graph)
+	if (!WorkingAsset)
 		return;
+
+	if (!WorkingAsset->Graph)
+	{
+		WorkingGraph->GetSchema()->CreateDefaultNodesForGraph(*WorkingGraph);
+		return;
+	}
 
 	TArray<std::pair<FGuid, FGuid>> Connections;
 	TMap<FGuid, UEdGraphPin*> IdToPinMap;
@@ -155,18 +170,36 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 	//Read all the nodes and pins from runtime graph, build editor graph nodes
 	for (const UDialogueGraphNode* GraphNode : WorkingAsset->Graph->Nodes)
 	{
-		UDialogueAssetEditorGraphNode* EditorNode = NewObject<UDialogueAssetEditorGraphNode>(WorkingGraph);
+		UDialogueAssetEditorGraphNodeBase* EditorNode{ nullptr };
+
+		switch (GraphNode->Type)
+		{
+		case EDialogueNode::EDN_Start:
+			EditorNode = NewObject<UDialogueAssetEditorGraphNodeStart>(WorkingGraph);
+			break;
+		case EDialogueNode::EDN_Dialogue:
+			EditorNode = NewObject<UDialogueAssetEditorGraphNodeStart>(WorkingGraph);
+			break;
+		case EDialogueNode::EDN_End:
+			break;
+		default:
+			UE_LOG(DialogueAssetEditorAppSub, Error, TEXT("DialogueAssetEditorApp::UpdateWorkingGraph() Unknown node type"))
+		}
+
 		EditorNode->CreateNewGuid();
 		EditorNode->NodePosX = GraphNode->Position.X;
 		EditorNode->NodePosY = GraphNode->Position.Y;
 
-		if (GraphNode->Data)
+		if (GraphNode->Type == EDialogueNode::EDN_Dialogue)
 		{
-			EditorNode->SetNodeData(DuplicateObject(GraphNode->Data, EditorNode));
-		}
-		else
-		{
-			EditorNode->SetNodeData(NewObject<UDialogueNodeData>(EditorNode));
+			if (GraphNode->Data)
+			{
+				EditorNode->SetNodeData(DuplicateObject(GraphNode->Data, EditorNode));
+			}
+			else
+			{
+				EditorNode->SetNodeData(NewObject<UDialogueNodeData>(EditorNode));
+			}
 		}
 
 		//Build input pin, record connection

@@ -1,27 +1,26 @@
 #pragma once
 
 #include "EdGraph/EdGraphNode.h"
+#include "DialogueAssetEditorGraphNodeBase.h"
+
 #include "DialogueAssetEditorGraphNode.generated.h"
 
 class UToolMenu;
 class UGraphNodeContextMenuContext;
-class UDialogueNodeData;
 
 UCLASS()
-class UDialogueAssetEditorGraphNode : public UEdGraphNode
+class UDialogueAssetEditorGraphNode : public UDialogueAssetEditorGraphNodeBase
 {
 	GENERATED_BODY()
-
-//private fields
-private:
-	UPROPERTY()
-	UDialogueNodeData* NodeData{ nullptr };
 
 //public methods
 public:
 	UDialogueAssetEditorGraphNode();
-	UEdGraphPin* CreateDialoguePin(const EEdGraphPinDirection& InDirection, FName InName);
 	void SyncPinsWithResponses();
+
+//Begin UDialogueAssetEditorGraphNodeBase interface
+	virtual UEdGraphPin* CreateDialoguePin(const EEdGraphPinDirection& InDirection, FName InName) override;
+//End UDialogueAssetEditorGraphNodeBase interface
 
 //Begin UEdGraphNode interface
 	virtual FText GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const override;
@@ -29,10 +28,4 @@ public:
 	virtual bool CanUserDeleteNode() const override { return true; }
 	virtual void GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const override;
 //End UEdGraphNode interface
-
-//getters/setters
-public:
-	FORCEINLINE void SetNodeData(UDialogueNodeData* InNodeData) { NodeData = InNodeData; }
-
-	FORCEINLINE UDialogueNodeData* GetNodeData() const { return NodeData; }
 };
