@@ -2,7 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NameTypes.h"
+
+#include "DialogueNodeData.h"
+
 #include "DialogueGraph.generated.h"
+
+class UDialogueNodeData;
 
 UCLASS()
 class DIALOGUESYSTEMRUNTIME_API UDialogueGraphPin : public UObject
@@ -34,6 +39,9 @@ public:
 
 	UPROPERTY()
 	FVector2D Position;
+
+	UPROPERTY()
+	UDialogueNodeData* Data;
 };
 
 UCLASS()

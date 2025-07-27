@@ -38,6 +38,30 @@ void DialogueAssetEditorApp::OnGraphChangeHandler(const FEdGraphEditAction& InEd
 	UpdateWorkingAsset();
 }
 
+void DialogueAssetEditorApp::OnGraphSelectionHandler(const FGraphPanelSelectionSet& InSelection) const
+{
+	//Find the first graph node if any
+	for (UObject* Object : InSelection)
+	{
+		UDialogueAssetEditorGraphNode* EditorNode = Cast<UDialogueAssetEditorGraphNode>(Object);
+		if (!EditorNode)
+			continue;
+
+		SelectedNodeDetailsView->SetObject(EditorNode->GetNodeData());
+		return;
+	}
+
+	SelectedNodeDetailsView->SetObject(nullptr);
+}
+
+void DialogueAssetEditorApp::OnNodeDetailsViewUpdated(const FPropertyChangedEvent& InEvent) const
+{
+	if (!WorkingGraphUi)
+		return;
+
+	WorkingGraphUi->NotifyGraphChanged();
+}
+
 void DialogueAssetEditorApp::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
 {
 	FWorkflowCentricApplication::RegisterTabSpawners(InTabManager);
@@ -66,10 +90,15 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 	TMap<FGuid, UDialogueGraphPin*>  IdToPinMap;
 
 	//Read all the nodes and pins from editor graph, create runtime nodes
-	for (const UEdGraphNode* EditorNode : WorkingGraph->Nodes)
+	for (UEdGraphNode* EditorNode : WorkingGraph->Nodes)
 	{
+		const UDialogueAssetEditorGraphNode* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNode>(EditorNode);
+		if (!DialogueEditorNode)
+			continue;
+
 		UDialogueGraphNode* GraphNode = NewObject<UDialogueGraphNode>(DialogueGraph);
 		GraphNode->Position = FVector2D(EditorNode->NodePosX, EditorNode->NodePosY);
+		GraphNode->Data = DialogueEditorNode->GetNodeData();
 
 		for (UEdGraphPin* EditorNodePin : EditorNode->Pins)
 		{
@@ -134,6 +163,15 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 		EditorNode->NodePosX = GraphNode->Position.X;
 		EditorNode->NodePosY = GraphNode->Position.Y;
 
+		if (GraphNode->Data)
+		{
+			EditorNode->SetNodeData(DuplicateObject(GraphNode->Data, EditorNode));
+		}
+		else
+		{
+			EditorNode->SetNodeData(NewObject<UDialogueNodeData>(EditorNode));
+		}
+
 		//Build input pin, record connection
 		if (UDialogueGraphPin* GraphNodeInputPin = GraphNode->Input)
 		{
@@ -174,4 +212,10 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 		PinA->LinkedTo.Add(PinB);
 		PinB->LinkedTo.Add(PinA);
 	}
+}
+
+void DialogueAssetEditorApp::SetSelectedNodeDetailView(const TSharedPtr<IDetailsView>& InDetailsView)
+{
+	SelectedNodeDetailsView = InDetailsView;
+	SelectedNodeDetailsView->OnFinishedChangingProperties().AddRaw(this, &DialogueAssetEditorApp::OnNodeDetailsViewUpdated);
 }

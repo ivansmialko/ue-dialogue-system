@@ -1,5 +1,6 @@
 #include "DialogueAssetEditorGraphSchema.h"
 #include "DialogueAssetEditorGraphNode.h"
+#include "DialogueNodeData.h"
 
 void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
 {
@@ -48,6 +49,7 @@ UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGrap
 	NewNode->NodePosX = Location.X;
 	NewNode->NodePosY = Location.Y;
 	NewNode->CreateNewGuid();
+	NewNode->SetNodeData(NewObject<UDialogueNodeData>(NewNode));
 
 	UEdGraphPin* InputPin = NewNode->CreateCustomPin(EGPD_Input, TEXT("Input"));
 	NewNode->CreateCustomPin(EGPD_Output, TEXT("Output"));

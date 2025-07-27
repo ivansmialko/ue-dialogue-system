@@ -13,13 +13,7 @@ class DIALOGUESYSTEMRUNTIME_API UDialogueAsset : public UObject
 //public fields
 public:
 	UPROPERTY(EditAnywhere)
-	FString AssetName;
-
-	UPROPERTY(EditAnywhere)
-	int32 AssetInteger;
-
-	UPROPERTY(EditAnywhere)
-	bool AssetBool;
+	FString DialogueName = TEXT("Enter dialogue name here");
 
 	UPROPERTY()
 	UDialogueGraph* Graph{ nullptr };

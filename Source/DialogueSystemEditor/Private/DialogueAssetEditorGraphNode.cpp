@@ -3,8 +3,18 @@
 #include "Framework/Commands/UIAction.h"
 #include "ToolMenu.h"
 
+#include "DialogueNodeData.h"
+
 UDialogueAssetEditorGraphNode::UDialogueAssetEditorGraphNode()
 {
+}
+
+FText UDialogueAssetEditorGraphNode::GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const
+{
+	if (!NodeData || NodeData->Title.IsEmpty())
+		return FText::FromString(TEXT("Dialogue node"));
+
+	return NodeData->Title;
 }
 
 void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,

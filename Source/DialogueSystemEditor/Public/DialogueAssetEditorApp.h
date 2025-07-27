@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
+#include "SGraphPanel.h"
 
 class UDialogueAsset;
 class UEdGraph;
+class IDetailsView;
 
 class DialogueAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
@@ -13,12 +15,18 @@ private:
 	UDialogueAsset* WorkingAsset{ nullptr };
 	UEdGraph* WorkingGraph{ nullptr };
 
+	//Working graph ui part (slate widget)
+	TSharedPtr<SGraphEditor> WorkingGraphUi{ nullptr };
+	TSharedPtr<IDetailsView> SelectedNodeDetailsView{ nullptr };
+
 	FDelegateHandle OnGraphChangeDlg;
 
 //public methods
 public:
 	void InitEditor(const EToolkitMode::Type InMode, const TSharedPtr<class IToolkitHost>& InToolkitHost, UObject* InCustomAsset);
 	void OnGraphChangeHandler(const FEdGraphEditAction& InEditAction) const;
+	void OnGraphSelectionHandler(const FGraphPanelSelectionSet& InSelection) const;
+	void OnNodeDetailsViewUpdated(const FPropertyChangedEvent& InEvent) const;
 
 //Begin FWorkflowCentricApplication interface
 	virtual void RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager) override;
@@ -41,6 +49,9 @@ protected:
 
 //getters/setters
 public:
+	void SetWorkingGraphUi(const TSharedPtr<SGraphEditor>& InWorkingGraphUi) { WorkingGraphUi = InWorkingGraphUi; }
+	void SetSelectedNodeDetailView(const TSharedPtr<IDetailsView>& InDetailsView);
+
 	UDialogueAsset* GetWorkingAsset() const { return WorkingAsset;  }
 	UEdGraph* GetWorkingGraph() const { return WorkingGraph; }
 };

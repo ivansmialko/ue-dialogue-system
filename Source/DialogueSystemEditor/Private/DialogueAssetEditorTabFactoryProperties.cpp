@@ -32,12 +32,23 @@ TSharedRef<SWidget> DialogueAssetEditorTabFactoryProperties::CreateTabBody(const
 	const TSharedPtr<IDetailsView> DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
 	DetailsView->SetObject(Application->GetWorkingAsset());
 
+	const TSharedPtr<IDetailsView> NodeDetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
+	NodeDetailsView->SetObject(nullptr);
+
+	Application->SetSelectedNodeDetailView(NodeDetailsView);
+
 	return SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
 		.FillHeight(1.0f)
 		.HAlign(HAlign_Fill)
 		[
 			DetailsView.ToSharedRef()
+		]
+		+ SVerticalBox::Slot()
+		.FillHeight(1.0f)
+		.HAlign(HAlign_Fill)
+		[
+			NodeDetailsView.ToSharedRef()
 		];
 }
 
