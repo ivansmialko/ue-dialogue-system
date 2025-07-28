@@ -3,15 +3,14 @@
 #include "CoreMinimal.h"
 #include "UObject/NameTypes.h"
 
-#include "DialogueNodeData.h"
-
 #include "DialogueGraph.generated.h"
 
-class UDialogueNodeData;
+class UDialogueNodeDataBase;
 
 UENUM()
 enum class EDialogueNode : uint8
 {
+	EDN_Unknown,
 	EDN_Start,
 	EDN_Dialogue,
 	EDN_End
@@ -49,7 +48,7 @@ public:
 	FVector2D Position;
 
 	UPROPERTY()
-	UDialogueNodeData* Data;
+	UDialogueNodeDataBase* Data;
 
 	UPROPERTY()
 	EDialogueNode Type{ EDialogueNode::EDN_Dialogue };

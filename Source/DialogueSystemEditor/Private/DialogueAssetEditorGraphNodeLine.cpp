@@ -1,15 +1,15 @@
-#include "DialogueAssetEditorGraphNode.h"
+#include "DialogueAssetEditorGraphNodeLine.h"
 
 #include "Framework/Commands/UIAction.h"
 #include "ToolMenu.h"
 
-#include "DialogueNodeData.h"
+#include "DialogueNodeDataLine.h"
 
-UDialogueAssetEditorGraphNode::UDialogueAssetEditorGraphNode()
+UDialogueAssetEditorGraphNodeLine::UDialogueAssetEditorGraphNodeLine()
 {
 }
 
-FText UDialogueAssetEditorGraphNode::GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const
+FText UDialogueAssetEditorGraphNodeLine::GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const
 {
 	if (!NodeData)
 		return FText::FromString("Dialogue node");
@@ -31,10 +31,10 @@ FText UDialogueAssetEditorGraphNode::GetNodeTitle(ENodeTitleType::Type InNodeTit
 	return NodeData->Title;
 }
 
-void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
+void UDialogueAssetEditorGraphNodeLine::GetNodeContextMenuActions(UToolMenu* Menu,
                                                               UGraphNodeContextMenuContext* Context) const
 {
-	UDialogueAssetEditorGraphNode* ThisNode = const_cast<UDialogueAssetEditorGraphNode*>(this);
+	UDialogueAssetEditorGraphNodeLine* ThisNode = const_cast<UDialogueAssetEditorGraphNodeLine*>(this);
 
 	FToolMenuSection& MenuSection = Menu->AddSection(TEXT("DefaultSection"), FText::FromString(TEXT("Default node actions")));
 	MenuSection.AddMenuEntry
@@ -66,7 +66,7 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 					UEdGraphPin* LastPin = ThisNode->GetPinAt(ThisNode->Pins.Num() - 1);
 					if (LastPin && LastPin->Direction != EGPD_Input)
 					{
-						UDialogueNodeData* NodeData = ThisNode->GetNodeData();
+						UDialogueNodeDataLine* NodeData = ThisNode->GetNodeData();
 						NodeData->Responses.RemoveAt(NodeData->Responses.Num() - 1);
 
 						ThisNode->SyncPinsWithResponses();
@@ -90,7 +90,7 @@ void UDialogueAssetEditorGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
 	);
 }
 
-UEdGraphPin* UDialogueAssetEditorGraphNode::CreateDialoguePin(const EEdGraphPinDirection& InDirection, const FName InName)
+UEdGraphPin* UDialogueAssetEditorGraphNodeLine::CreateDialoguePin(const EEdGraphPinDirection& InDirection, const FName InName)
 {
 	const FName Category = (InDirection == EGPD_Input ? TEXT("Inputs") : TEXT("Outputs"));
 	const FName Subcategory = TEXT("NodeDialogue");
@@ -101,7 +101,7 @@ UEdGraphPin* UDialogueAssetEditorGraphNode::CreateDialoguePin(const EEdGraphPinD
 	return Pin;
 }
 
-void UDialogueAssetEditorGraphNode::SyncPinsWithResponses()
+void UDialogueAssetEditorGraphNodeLine::SyncPinsWithResponses()
 {
 	//Sync the pins with the dialogue responses array
 	//We're going to assume the first pin is always the input pin

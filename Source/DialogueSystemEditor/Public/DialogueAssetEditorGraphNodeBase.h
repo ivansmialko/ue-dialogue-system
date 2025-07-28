@@ -3,7 +3,7 @@
 #include "EdGraph/EdGraphNode.h"
 #include "DialogueAssetEditorGraphNodeBase.generated.h"
 
-class UDialogueNodeData;
+class UDialogueNodeDataBase;
 
 UCLASS()
 class UDialogueAssetEditorGraphNodeBase : public UEdGraphNode
@@ -13,14 +13,17 @@ class UDialogueAssetEditorGraphNodeBase : public UEdGraphNode
 //protected fields
 protected:
 	UPROPERTY()
-	UDialogueNodeData* NodeData{ nullptr };
+	UDialogueNodeDataBase* NodeData{ nullptr };
 
 //public methods
 public:
-	virtual UEdGraphPin* CreateDialoguePin(const EEdGraphPinDirection& InDirection, FName InName);
+	virtual UEdGraphPin* CreateDialoguePin(const EEdGraphPinDirection& InDirection, FName InName) { return nullptr; }
+	virtual UEdGraphPin* CreateDefaultPin() { return nullptr; }
+	virtual void CreateDefaultOutputPins() { /* Don't do anything by default */}
+	virtual void InitNodeInfo(UObject* Output) { /*Nothing by default */ }
 
 //getters/setters
 public:
-	FORCEINLINE void SetNodeData(UDialogueNodeData* InNodeData) { NodeData = InNodeData; }
-	FORCEINLINE UDialogueNodeData* GetNodeData() const { return NodeData; }
+	FORCEINLINE void SetNodeData(UDialogueNodeDataBase* InNodeData) { NodeData = InNodeData; }
+	FORCEINLINE UDialogueNodeDataBase* GetNodeData() const { return NodeData; }
 };

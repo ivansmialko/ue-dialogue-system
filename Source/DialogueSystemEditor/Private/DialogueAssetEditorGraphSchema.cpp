@@ -1,7 +1,7 @@
 #include "DialogueAssetEditorGraphSchema.h"
-#include "DialogueAssetEditorGraphNode.h"
+#include "DialogueAssetEditorGraphNodeLine.h"
 #include "DialogueAssetEditorGraphNodeStart.h"
-#include "DialogueNodeData.h"
+#include "DialogueNodeDataLine.h"
 
 void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
 {
@@ -59,11 +59,11 @@ FNewNodeAction::FNewNodeAction(const FText& InNodeCategory, const FText& InMenuD
 UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin,
 	const FVector2f& Location, bool bSelectNewNode)
 {
-	UDialogueAssetEditorGraphNode* NewNode = NewObject<UDialogueAssetEditorGraphNode>(ParentGraph);
+	UDialogueAssetEditorGraphNodeLine* NewNode = NewObject<UDialogueAssetEditorGraphNodeLine>(ParentGraph);
 	NewNode->NodePosX = Location.X;
 	NewNode->NodePosY = Location.Y;
 	NewNode->CreateNewGuid();
-	NewNode->SetNodeData(NewObject<UDialogueNodeData>(NewNode));
+	NewNode->SetNodeData(NewObject<UDialogueNodeDataLine>(NewNode));
 
 	UEdGraphPin* InputPin = NewNode->CreateDialoguePin(EGPD_Input, TEXT("Display"));
 	FString DefaultResponse = TEXT("Response");

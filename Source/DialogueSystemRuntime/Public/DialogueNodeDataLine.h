@@ -1,10 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DialogueNodeData.generated.h"
+#include "DialogueNodeDataBase.h"
+#include "DialogueNodeDataLine.generated.h"
 
 UCLASS(BlueprintType)
-class DIALOGUESYSTEMRUNTIME_API UDialogueNodeData : public UObject
+class DIALOGUESYSTEMRUNTIME_API UDialogueNodeDataLine : public UDialogueNodeDataBase
 {
 	GENERATED_BODY()
 

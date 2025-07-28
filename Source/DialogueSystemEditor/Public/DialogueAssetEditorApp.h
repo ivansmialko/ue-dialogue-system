@@ -7,7 +7,7 @@
 class UDialogueAsset;
 class UEdGraph;
 class IDetailsView;
-class UDialogueAssetEditorGraphNode;
+class UDialogueAssetEditorGraphNodeLine;
 
 class DialogueAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
 {
@@ -45,7 +45,7 @@ public:
 protected:
 	void UpdateWorkingAsset() const;
 	void UpdateWorkingGraph() const;
-	UDialogueAssetEditorGraphNode* GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const;
+	UDialogueAssetEditorGraphNodeLine* GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const;
 	
 
 //getters/setters

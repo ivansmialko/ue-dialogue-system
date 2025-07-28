@@ -1,6 +1,6 @@
 #include "DialogueAssetEditorApp.h"
 #include "DialogueAsset.h"
-#include "DialogueAssetEditorGraphNode.h"
+#include "DialogueAssetEditorGraphNodeLine.h"
 #include "DialogueAssetEditorGraphNodeStart.h"
 #include "DialogueGraph.h"
 #include "DialogueAssetEditorTabModeMain.h"
@@ -44,7 +44,7 @@ void DialogueAssetEditorApp::OnWorkingAssetPreSave() const
 
 void DialogueAssetEditorApp::OnGraphSelectionHandler(const FGraphPanelSelectionSet& InSelection) const
 {
-	const UDialogueAssetEditorGraphNode* SelectedNode = GetSelectedNode(InSelection);
+	const UDialogueAssetEditorGraphNodeLine* SelectedNode = GetSelectedNode(InSelection);
 	SelectedNodeDetailsView->SetObject(SelectedNode ? SelectedNode->GetNodeData() : nullptr);
 }
 
@@ -53,7 +53,7 @@ void DialogueAssetEditorApp::OnNodeDetailsViewUpdated(const FPropertyChangedEven
 	if (!WorkingGraphUi)
 		return;
 
-	UDialogueAssetEditorGraphNode* SelectedNode = GetSelectedNode(WorkingGraphUi->GetSelectedNodes());
+	UDialogueAssetEditorGraphNodeLine* SelectedNode = GetSelectedNode(WorkingGraphUi->GetSelectedNodes());
 	if (!SelectedNode)
 		return;
 
@@ -123,9 +123,9 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 			default: break;
 			}
 
-			if (EditorNode->IsA(UDialogueAssetEditorGraphNode::StaticClass()))
+			if (EditorNode->IsA(UDialogueAssetEditorGraphNodeLine::StaticClass()))
 			{
-				const UDialogueAssetEditorGraphNode* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNode>(EditorNode);
+				const UDialogueAssetEditorGraphNodeLine* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNodeLine>(EditorNode);
 				GraphNode->Type = EDialogueNode::EDN_Dialogue;
 				GraphNode->Data = DialogueEditorNode->GetNodeData();
 			}
@@ -198,7 +198,7 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 			}
 			else
 			{
-				EditorNode->SetNodeData(NewObject<UDialogueNodeData>(EditorNode));
+				EditorNode->SetNodeData(NewObject<UDialogueNodeDataLine>(EditorNode));
 			}
 		}
 
@@ -245,12 +245,12 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-UDialogueAssetEditorGraphNode* DialogueAssetEditorApp::GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const
+UDialogueAssetEditorGraphNodeLine* DialogueAssetEditorApp::GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const
 {
 	//Find the first graph node if any
 	for (UObject* Object : InSelection)
 	{
-		UDialogueAssetEditorGraphNode* EditorNode = Cast<UDialogueAssetEditorGraphNode>(Object);
+		UDialogueAssetEditorGraphNodeLine* EditorNode = Cast<UDialogueAssetEditorGraphNodeLine>(Object);
 		if (!EditorNode)
 			continue;
 

@@ -3,19 +3,19 @@
 #include "EdGraph/EdGraphNode.h"
 #include "DialogueAssetEditorGraphNodeBase.h"
 
-#include "DialogueAssetEditorGraphNode.generated.h"
+#include "DialogueAssetEditorGraphNodeLine.generated.h"
 
 class UToolMenu;
 class UGraphNodeContextMenuContext;
 
 UCLASS()
-class UDialogueAssetEditorGraphNode : public UDialogueAssetEditorGraphNodeBase
+class UDialogueAssetEditorGraphNodeLine : public UDialogueAssetEditorGraphNodeBase
 {
 	GENERATED_BODY()
 
 //public methods
 public:
-	UDialogueAssetEditorGraphNode();
+	UDialogueAssetEditorGraphNodeLine();
 	void SyncPinsWithResponses();
 
 //Begin UDialogueAssetEditorGraphNodeBase interface
