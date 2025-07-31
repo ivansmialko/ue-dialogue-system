@@ -240,7 +240,7 @@ UDialogueAssetEditorGraphNodeBase* DialogueAssetEditorApp::GetSelectedNode(const
 	//Find the first graph node if any
 	for (UObject* Object : InSelection)
 	{
-		UDialogueAssetEditorGraphNodeLine* EditorNode = Cast<UDialogueAssetEditorGraphNodeLine>(Object);
+		UDialogueAssetEditorGraphNodeBase* EditorNode = Cast<UDialogueAssetEditorGraphNodeBase>(Object);
 		if (!EditorNode)
 			continue;
 
