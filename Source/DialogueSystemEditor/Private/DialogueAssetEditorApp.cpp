@@ -1,5 +1,6 @@
 #include "DialogueAssetEditorApp.h"
 #include "DialogueAsset.h"
+#include "DialogueAssetEditorGraphNodeEnd.h"
 #include "DialogueAssetEditorGraphNodeLine.h"
 #include "DialogueAssetEditorGraphNodeStart.h"
 #include "DialogueGraph.h"
@@ -44,7 +45,7 @@ void DialogueAssetEditorApp::OnWorkingAssetPreSave() const
 
 void DialogueAssetEditorApp::OnGraphSelectionHandler(const FGraphPanelSelectionSet& InSelection) const
 {
-	const UDialogueAssetEditorGraphNodeLine* SelectedNode = GetSelectedNode(InSelection);
+	const UDialogueAssetEditorGraphNodeBase* SelectedNode = GetSelectedNode(InSelection);
 	SelectedNodeDetailsView->SetObject(SelectedNode ? SelectedNode->GetNodeData() : nullptr);
 }
 
@@ -53,11 +54,11 @@ void DialogueAssetEditorApp::OnNodeDetailsViewUpdated(const FPropertyChangedEven
 	if (!WorkingGraphUi)
 		return;
 
-	UDialogueAssetEditorGraphNodeLine* SelectedNode = GetSelectedNode(WorkingGraphUi->GetSelectedNodes());
+	UDialogueAssetEditorGraphNodeBase* SelectedNode = GetSelectedNode(WorkingGraphUi->GetSelectedNodes());
 	if (!SelectedNode)
 		return;
 
-	SelectedNode->SyncPinsWithResponses();
+	SelectedNode->OnPropertiesChanged();
 
 	WorkingGraphUi->NotifyGraphChanged();
 }
@@ -123,16 +124,9 @@ void DialogueAssetEditorApp::UpdateWorkingAsset() const
 			default: break;
 			}
 
-			if (EditorNode->IsA(UDialogueAssetEditorGraphNodeLine::StaticClass()))
-			{
-				const UDialogueAssetEditorGraphNodeLine* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNodeLine>(EditorNode);
-				GraphNode->Type = EDialogueNode::EDN_Dialogue;
-				GraphNode->Data = DialogueEditorNode->GetNodeData();
-			}
-			else if (EditorNode->IsA(UDialogueAssetEditorGraphNodeStart::StaticClass()))
-			{
-				GraphNode->Type = EDialogueNode::EDN_Start;
-			}
+			const UDialogueAssetEditorGraphNodeBase* DialogueEditorNode = Cast<UDialogueAssetEditorGraphNodeBase>(EditorNode);
+			GraphNode->Type = DialogueEditorNode->GetDialogueNodeType();
+			GraphNode->Data = DuplicateObject(DialogueEditorNode->GetNodeData(), GraphNode);
 
 			IdToPinMap.Add(EditorNodePin->PinId, GraphPin);
 		}
@@ -174,14 +168,14 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 
 		switch (GraphNode->Type)
 		{
-		case EDialogueNode::EDN_Start:
+		case EDialogueNodeType::EDNT_Start:
 			EditorNode = NewObject<UDialogueAssetEditorGraphNodeStart>(WorkingGraph);
 			break;
-		case EDialogueNode::EDN_Dialogue:
+		case EDialogueNodeType::EDNT_Line:
 			EditorNode = NewObject<UDialogueAssetEditorGraphNodeStart>(WorkingGraph);
 			break;
-		case EDialogueNode::EDN_End:
-			break;
+		case EDialogueNodeType::EDNT_End:
+			EditorNode = NewObject<UDialogueAssetEditorGraphNodeEnd>(WorkingGraph);
 		default:
 			UE_LOG(DialogueAssetEditorAppSub, Error, TEXT("DialogueAssetEditorApp::UpdateWorkingGraph() Unknown node type"))
 		}
@@ -189,17 +183,13 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 		EditorNode->CreateNewGuid();
 		EditorNode->NodePosX = GraphNode->Position.X;
 		EditorNode->NodePosY = GraphNode->Position.Y;
-
-		if (GraphNode->Type == EDialogueNode::EDN_Dialogue)
+		if (GraphNode->Data)
 		{
-			if (GraphNode->Data)
-			{
-				EditorNode->SetNodeData(DuplicateObject(GraphNode->Data, EditorNode));
-			}
-			else
-			{
-				EditorNode->SetNodeData(NewObject<UDialogueNodeDataLine>(EditorNode));
-			}
+			EditorNode->SetNodeData(DuplicateObject(GraphNode->Data, EditorNode));
+		}
+		else
+		{
+			EditorNode->InitNodeData(EditorNode);
 		}
 
 		//Build input pin, record connection
@@ -245,7 +235,7 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-UDialogueAssetEditorGraphNodeLine* DialogueAssetEditorApp::GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const
+UDialogueAssetEditorGraphNodeBase* DialogueAssetEditorApp::GetSelectedNode(const FGraphPanelSelectionSet& InSelection) const
 {
 	//Find the first graph node if any
 	for (UObject* Object : InSelection)

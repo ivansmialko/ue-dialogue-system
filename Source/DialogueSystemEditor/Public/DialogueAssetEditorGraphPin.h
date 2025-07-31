@@ -30,6 +30,20 @@ protected:
 	virtual FSlateColor GetPinColor() const override;
 };
 
+class SDialogueAssetEditorGraphPinEndInput : public SGraphPin
+{
+//public methods
+public:
+	SLATE_BEGIN_ARGS(SDialogueAssetEditorGraphPinStartOutput) {}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj);
+
+//protected methods
+protected:
+	virtual FSlateColor GetPinColor() const override;
+};
+
 struct FDialogueAssetEditorGraphPinFactory : FGraphPanelPinFactory
 {
 //public methods

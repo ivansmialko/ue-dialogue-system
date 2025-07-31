@@ -1,22 +1,37 @@
 #include "DialogueAssetEditorGraphSchema.h"
 #include "DialogueAssetEditorGraphNodeLine.h"
 #include "DialogueAssetEditorGraphNodeStart.h"
+#include "DialogueAssetEditorGraphNodeEnd.h"
 #include "DialogueNodeDataLine.h"
 
 void UDialogueAssetEditorGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& InContextMenuBuilder) const
 {
-	TSharedPtr<FNewNodeAction> NewNodeAction
+	const TSharedPtr<FNewNodeAction> ActionCreateNodeLine
 	(
 		new FNewNodeAction
 		(
+			UDialogueAssetEditorGraphNodeLine::StaticClass(),
 			FText::FromString(TEXT("Nodes")),
-			FText::FromString(TEXT("New node")),
-			FText::FromString(TEXT("Makes a new node")),
+			FText::FromString(TEXT("New dialogue line")),
+			FText::FromString(TEXT("Creates a new dialogue line")),
 			0
 		)
 	);
 
-	InContextMenuBuilder.AddAction(NewNodeAction);
+	const TSharedPtr<FNewNodeAction> ActionCreateNodeEnd
+	(
+		new FNewNodeAction
+		(
+			UDialogueAssetEditorGraphNodeEnd::StaticClass(),
+			FText::FromString(TEXT("Nodes")),
+			FText::FromString(TEXT("New dialogue end")),
+			FText::FromString(TEXT("Creates a new dialogue end")),
+			0
+		)
+	);
+
+	InContextMenuBuilder.AddAction(ActionCreateNodeLine);
+	InContextMenuBuilder.AddAction(ActionCreateNodeEnd);
 }
 
 const FPinConnectionResponse UDialogueAssetEditorGraphSchema::CanCreateConnection(const UEdGraphPin* InA,
@@ -51,26 +66,21 @@ FNewNodeAction::FNewNodeAction()
 {
 }
 
-FNewNodeAction::FNewNodeAction(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping):
-	FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping)
+FNewNodeAction::FNewNodeAction(UClass* InClassTemplate, const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping):
+	FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping), ClassTemplate(InClassTemplate)
 {
 }
 
 UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin,
 	const FVector2f& Location, bool bSelectNewNode)
 {
-	UDialogueAssetEditorGraphNodeLine* NewNode = NewObject<UDialogueAssetEditorGraphNodeLine>(ParentGraph);
+	UDialogueAssetEditorGraphNodeBase* NewNode = NewObject<UDialogueAssetEditorGraphNodeBase>(ParentGraph, ClassTemplate);
 	NewNode->NodePosX = Location.X;
 	NewNode->NodePosY = Location.Y;
 	NewNode->CreateNewGuid();
-	NewNode->SetNodeData(NewObject<UDialogueNodeDataLine>(NewNode));
-
-	UEdGraphPin* InputPin = NewNode->CreateDialoguePin(EGPD_Input, TEXT("Display"));
-	FString DefaultResponse = TEXT("Response");
-	NewNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(DefaultResponse));
-	NewNode->GetNodeData()->Responses.Add(FText::FromString(DefaultResponse));
-
-	if (FromPin)
+	NewNode->InitNodeData(NewNode);
+	
+	if (UEdGraphPin* InputPin = NewNode->CreateDefaultInputPin())
 	{
 		NewNode->GetSchema()->TryCreateConnection(InputPin, FromPin);
 	}

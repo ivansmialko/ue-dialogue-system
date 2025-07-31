@@ -12,10 +12,10 @@ UDialogueAssetEditorGraphNodeLine::UDialogueAssetEditorGraphNodeLine()
 FText UDialogueAssetEditorGraphNodeLine::GetNodeTitle(ENodeTitleType::Type InNodeTitleType) const
 {
 	if (!NodeData)
-		return FText::FromString("Dialogue node");
+		return FText::FromString("Dialogue line");
 
 	if (NodeData->Title.IsEmpty() && NodeData->Text.IsEmpty())
-		return FText::FromString("Dialogue node");
+		return FText::FromString("Dialogue line");
 
 	if (NodeData->Title.IsEmpty() && !NodeData->Text.IsEmpty())
 	{
@@ -45,7 +45,7 @@ void UDialogueAssetEditorGraphNodeLine::GetNodeContextMenuActions(UToolMenu* Men
 		FSlateIcon(TEXT("DialogEditorStyle"), TEXT("DialogueAssetEditor.NodePinAddIcon")),
 		FUIAction(FExecuteAction::CreateLambda([ThisNode]()
 			{
-				ThisNode->GetNodeData()->Responses.Add(FText::FromString(TEXT("Response")));
+				ThisNode->GetNodeDataLine()->Responses.Add(FText::FromString(TEXT("Response")));
 				ThisNode->SyncPinsWithResponses();
 
 				ThisNode->GetGraph()->NotifyGraphChanged();
@@ -66,7 +66,7 @@ void UDialogueAssetEditorGraphNodeLine::GetNodeContextMenuActions(UToolMenu* Men
 					UEdGraphPin* LastPin = ThisNode->GetPinAt(ThisNode->Pins.Num() - 1);
 					if (LastPin && LastPin->Direction != EGPD_Input)
 					{
-						UDialogueNodeDataLine* NodeData = ThisNode->GetNodeData();
+						UDialogueNodeDataLine* NodeData = ThisNode->GetNodeDataLine();
 						NodeData->Responses.RemoveAt(NodeData->Responses.Num() - 1);
 
 						ThisNode->SyncPinsWithResponses();
@@ -99,6 +99,18 @@ UEdGraphPin* UDialogueAssetEditorGraphNodeLine::CreateDialoguePin(const EEdGraph
 	Pin->PinType.PinSubCategory = Subcategory;
 
 	return Pin;
+}
+
+UEdGraphPin* UDialogueAssetEditorGraphNodeLine::CreateDefaultInputPin()
+{
+	return CreateDialoguePin(EEdGraphPinDirection::EGPD_Input, TEXT("Display"));
+}
+
+void UDialogueAssetEditorGraphNodeLine::CreateDefaultOutputPins()
+{
+	FString DefaultResponse = TEXT("Response");
+	CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(DefaultResponse));
+	GetNodeDataLine()->Responses.Add(FText::FromString(DefaultResponse));
 }
 
 void UDialogueAssetEditorGraphNodeLine::SyncPinsWithResponses()

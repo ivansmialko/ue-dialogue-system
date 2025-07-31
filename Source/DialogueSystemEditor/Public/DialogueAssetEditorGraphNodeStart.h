@@ -2,6 +2,7 @@
 
 #include "EdGraph/EdGraph.h"
 #include "DialogueAssetEditorGraphNodeBase.h"
+#include "DialogueNodeType.h"
 
 #include "DialogueAssetEditorGraphNodeStart.generated.h"
 
@@ -20,5 +21,6 @@ public:
 
 //Begin UDialogueAssetEditorGraphNodeBase interface
 	virtual UEdGraphPin* CreateDialoguePin(const EEdGraphPinDirection& InDirection, FName InName) override;
-//End UDialogueAssetEditorGraphNodeBase interface
+	virtual EDialogueNodeType GetDialogueNodeType() const override { return EDialogueNodeType::EDNT_Start; }
+	//End UDialogueAssetEditorGraphNodeBase interface
 };

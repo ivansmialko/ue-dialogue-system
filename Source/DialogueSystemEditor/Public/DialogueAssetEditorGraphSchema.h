@@ -24,11 +24,16 @@ struct FNewNodeAction : public FEdGraphSchemaAction
 {
 	GENERATED_BODY()
 
+
+//protected members
+protected:
+	UClass* ClassTemplate{ nullptr };
+
 //public methods
 public:
 //Begin UEdGraphSchemaAction interface
 	FNewNodeAction();
-	FNewNodeAction(const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping);
+	FNewNodeAction(UClass* InClassTemplate, const FText& InNodeCategory, const FText& InMenuDesc, const FText& InToolTip, const int32 InGrouping);
 
 	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2f& Location, bool bSelectNewNode = true) override;
 //End UEdGraphSchemaAction interface
