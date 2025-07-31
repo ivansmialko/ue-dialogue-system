@@ -172,10 +172,11 @@ void DialogueAssetEditorApp::UpdateWorkingGraph() const
 			EditorNode = NewObject<UDialogueAssetEditorGraphNodeStart>(WorkingGraph);
 			break;
 		case EDialogueNodeType::EDNT_Line:
-			EditorNode = NewObject<UDialogueAssetEditorGraphNodeStart>(WorkingGraph);
+			EditorNode = NewObject<UDialogueAssetEditorGraphNodeLine>(WorkingGraph);
 			break;
 		case EDialogueNodeType::EDNT_End:
 			EditorNode = NewObject<UDialogueAssetEditorGraphNodeEnd>(WorkingGraph);
+			break;
 		default:
 			UE_LOG(DialogueAssetEditorAppSub, Error, TEXT("DialogueAssetEditorApp::UpdateWorkingGraph() Unknown node type"))
 		}
